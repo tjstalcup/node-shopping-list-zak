@@ -11,14 +11,26 @@ var Storage = {
         return item;
     },
     remove: function(id) {
-        var newItems = [];
-        this.items.forEach(function(i) {
-            if ((i.id != id)) {
-                newItems.push(i);
-            }
+        // solution 1 - 7 lines of code
+        // var newItems = [];
+        // this.items.forEach(function(i) {
+        //     if ((i.id != id)) {
+        //         newItems.push(i);
+        //     }
+        // });
+        // this.items = newItems;
 
+        // solution 2 - 5 lines of code
+        // for (var i = 0; i < this.items.length; i++) {
+        //     if(this.items[i].id == id){
+        //         this.items.splice(i,1);
+        //     }
+        // }
+
+        // solution 3 - 3 lines of code
+        this.items = this.items.filter(function(item) {
+          return item.id != id ;
         });
-        this.items = newItems;
     },
     edit: function(name, id) {
         this.items.forEach(function(i) {
@@ -69,11 +81,18 @@ app.delete("/items/:id", function(request, response) {
 });
 
 app.put("/items/:id", jsonParser, function(request, response) {
-    if (request.body.id != request.params.id) return response.sendStatus(400);
+    if (!("name" in request.body)) {
+        return response.sendStatus(400);
+    }
+    if (!("id" in request.body)) {
+        return response.sendStatus(400);
+    }
     //If All is okay
     response.sendStatus(200);
     var id = request.body.id;
     storage.edit(request.body.name, id);
 });
 
-app.listen(process.env.PORT || 8080, process.env.IP);
+app.listen(process.env.PORT || 8080, process.env.IP, function(){
+    console.log('Server running at http://localhost:8080');
+});
